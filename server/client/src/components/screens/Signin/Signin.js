@@ -1,32 +1,33 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import "./signup.css";
-import { isEmpty, isEmail, equals } from "validator";
-import { showErrorMessage, showSuccessMessage } from "../helpers/message";
-import { showLoading } from "../helpers/loading";
-import { signup } from "../api/signup";
-const Signup = () => {
+import React, { useEffect, useState } from "react";
+import { Link, useHistory } from "react-router-dom";
+import "./sigin.css";
+import { isEmpty, isEmail } from "validator";
+import { showErrorMessage } from "../../helpers/message";
+import { showLoading } from "../../helpers/loading";
+import { signin } from "../../api/signin";
+import { isAuthenticated, setAuthentication } from "../../helpers/auth";
+const Signin = () => {
+  //useHistory hook for redirecting
+  const history = useHistory();
+  //useEffect hook
+  useEffect(() => {
+    if (isAuthenticated() && isAuthenticated().role === 1) {
+      history.push("/admin/dashboard");
+    } else if (isAuthenticated() && isAuthenticated().role === 0) {
+      history.push("/user/dashboard");
+    }
+  }, [history]);
+
   // set formdata state
   const [formData, setFormData] = useState({
-    username: "",
     email: "",
     password: "",
-    confirmPassword: "",
-    successMsg: false,
-    errorMsg: false,
     loading: false,
+    errorMsg: false,
   });
 
   //destructure form data state
-  const {
-    username,
-    email,
-    password,
-    confirmPassword,
-    successMsg,
-    errorMsg,
-    loading,
-  } = formData;
+  const { email, password, errorMsg, loading } = formData;
 
   /* event handlers */
   //handle change
@@ -34,20 +35,14 @@ const Signup = () => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-      successMsg: "",
       errorMsg: "",
     });
   };
 
   // handle submit
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (
-      isEmpty(username) ||
-      isEmpty(email) ||
-      isEmpty(password) ||
-      isEmpty(confirmPassword)
-    ) {
+    if (isEmpty(email) || isEmpty(password)) {
       setFormData({
         ...formData,
         errorMsg: "All fields are required",
@@ -57,33 +52,27 @@ const Signup = () => {
         ...formData,
         errorMsg: "Please enter a valid email",
       });
-    } else if (!equals(password, confirmPassword)) {
-      setFormData({
-        ...formData,
-        errorMsg: "Passwords do not match",
-      });
     } else {
-      const { email, username, password } = formData;
-      const data = { email, username, password };
+      const { email, password } = formData;
+      const data = { email, password };
       setFormData({
         ...formData,
         loading: true,
       });
-      signup(data)
+      signin(data)
         .then((response) => {
-          console.log(response);
+          setAuthentication(response.data.token, response.data.user);
+          if (isAuthenticated() && isAuthenticated().role === 1) {
+            history.push("/admin/dashboard");
+          } else {
+            history.push("/user/dashboard");
+          }
           setFormData({
             ...formData,
-            username: "",
-            email: "",
-            password: "",
-            confirmPassword: "",
             loading: false,
-            successMsg: response.data.successMessage,
           });
         })
         .catch((error) => {
-          console.log(error.response);
           setFormData({
             ...formData,
             errorMsg: error.response.data.errorMessage,
@@ -92,23 +81,8 @@ const Signup = () => {
     }
   };
 
-  const showSignup = () => (
+  const showSignin = () => (
     <form onSubmit={handleSubmit}>
-      <div className="form-group input-group">
-        <div className="input-group-prepend">
-          <span className="input-group-text">
-            <i className="fa fa-user"></i>
-          </span>
-        </div>
-        <input
-          className="form-control"
-          name="username"
-          onChange={handleChange}
-          placeholder="Username"
-          type="text"
-          value={username}
-        />
-      </div>
       <div className="form-group input-group">
         <div className="input-group-prepend">
           <span className="input-group-text">
@@ -139,29 +113,14 @@ const Signup = () => {
           value={password}
         />
       </div>
-      <div className="form-group input-group">
-        <div className="input-group-prepend">
-          <span className="input-group-text">
-            <i className="fa fa-lock"></i>
-          </span>
-        </div>
-        <input
-          className="form-control"
-          name="confirmPassword"
-          onChange={handleChange}
-          placeholder="Confirm Password"
-          type="password"
-          value={confirmPassword}
-        />
-      </div>
 
       <div className="form-group">
         <button type="submit" className=" btn btn-primary btn-block">
-          Signup
+          Login
         </button>
       </div>
       <p className="text-center">
-        Have an account? <Link to="/signin">Log In</Link>
+        Don't have an account? <Link to="/signup">Create One</Link>
       </p>
     </form>
   );
@@ -171,14 +130,12 @@ const Signup = () => {
         {errorMsg && (
           <div className="text-center">{showErrorMessage(errorMsg)}</div>
         )}
-        {successMsg && (
-          <div className="text-center"> {showSuccessMessage(successMsg)} </div>
-        )}
+
         {loading && <div className="text-center"> {showLoading()} </div>}
-        {showSignup()}
+        {showSignin()}
       </div>
     </div>
   );
 };
 
-export default Signup;
+export default Signin;
