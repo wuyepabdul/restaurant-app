@@ -70,11 +70,10 @@ module.exports.signinController = async (req, res) => {
         }
         const { _id, username, email, role } = userExist;
         const user = { _id, username, email, role };
-        console.log("token:", token, "user:", user);
         res.json({ token, user });
       }
     );
   } catch (error) {
-    console.log(error.message);
+    res.status(500).json({ errorMessage: "Server error, try again later" });
   }
 };
