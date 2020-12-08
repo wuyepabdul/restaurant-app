@@ -7,35 +7,47 @@ import { clearMessages } from "../../../redux/actions/messagesAction";
 import { createCategory } from "../../../redux/actions/categoryAction";
 
 const AdminCategoryModal = () => {
+  const dispatch = useDispatch();
+
   /* REDUX GLOBAL STATE PROPERTIES */
   const { successMsg, errorMsg } = useSelector((state) => state.messages);
   const { loading } = useSelector((state) => state.loading);
-  const dispatch = useDispatch();
 
-  /* COMPONENT STATE */
-  const [componentErrorMsg, setComponentErrorMsg] = useState("");
+  // const [loading, setLoading] = useState(false);
+
+  const [clientSideError, setClientSideError] = useState("");
   // set formdata state
-  const [category, setCategory] = useState("");
+  const [formData, setFormData] = useState({
+    category: "",
+  });
+
+  const { category } = formData;
 
   const handleResetMessages = (e) => {
     dispatch(clearMessages());
-    setComponentErrorMsg("");
-    setCategory("");
+    setFormData({
+      ...formData,
+      [e.target.name]: "",
+    });
   };
 
   //handle change
   const handleCategoryChange = (e) => {
     dispatch(clearMessages());
-    setComponentErrorMsg("");
-    setCategory(e.target.value);
+    setClientSideError("");
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   // handle category submit
   const handleCategorySubmit = (e) => {
     e.preventDefault();
     if (isEmpty(category)) {
-      setComponentErrorMsg("Please enter a category");
+      setClientSideError("Please select a category");
     } else {
+      const { category } = formData;
       const data = { category };
       dispatch(createCategory(data));
     }
@@ -55,9 +67,9 @@ const AdminCategoryModal = () => {
               </button>
             </div>
             <div className="modal-body my-2">
-              {componentErrorMsg && (
+              {clientSideError && (
                 <div className="text-center">
-                  {showErrorMessage(componentErrorMsg)}
+                  {showErrorMessage(clientSideError)}
                 </div>
               )}
               {errorMsg && (
