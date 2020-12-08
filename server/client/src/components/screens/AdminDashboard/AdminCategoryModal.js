@@ -3,20 +3,19 @@ import { isEmpty } from "validator";
 import { showErrorMessage, showSuccessMessage } from "../../helpers/message";
 import { showLoading } from "../../helpers/loading";
 import { createCategory } from "../../api/category";
-const Admin = () => {
+
+const AdminCategoryModal = () => {
+  const [loading, setLoading] = useState(false);
+
   // set formdata state
   const [formData, setFormData] = useState({
     category: "",
 
-    loading: false,
     errorMsg: false,
     successMsg: false,
   });
 
-  //destructure form data state
-  const { category, successMsg, errorMsg, loading } = formData;
-
-  // handle reset messages
+  const { category, successMsg, errorMsg } = formData;
 
   const handleResetMessages = (e) => {
     setFormData({
@@ -27,7 +26,6 @@ const Admin = () => {
     });
   };
 
-  /* event handlers */
   //handle change
   const handleCategoryChange = (e) => {
     setFormData({
@@ -38,7 +36,7 @@ const Admin = () => {
     });
   };
 
-  // handle submit
+  // handle category submit
   const handleCategorySubmit = (e) => {
     e.preventDefault();
     if (isEmpty(category)) {
@@ -49,20 +47,18 @@ const Admin = () => {
     } else {
       const { category } = formData;
       const data = { category };
-      setFormData({
-        ...formData,
-        loading: true,
-      });
+      setLoading(true);
       createCategory(data)
         .then((response) => {
+          setLoading(false);
           setFormData({
             ...formData,
-            loading: false,
             successMsg: response.data.successMessage,
             category: "",
           });
         })
         .catch((error) => {
+          setLoading(false);
           setFormData({
             ...formData,
             errorMsg: error.response.data.errorMessage,
@@ -72,45 +68,7 @@ const Admin = () => {
     }
   };
 
-  const showHeader = () => (
-    <div className="bg-dark text-white py-4">
-      <div className="container">
-        <div className="row">
-          <div className="col-md-6">
-            <i className="fas fa-home"> Dashboard</i>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-  const showActionButtons = () => (
-    <div className="bg-light my-2">
-      <div className="container">
-        <div className="row pb-3">
-          <div className="col-md-4  my-1">
-            <button
-              className="btn btn-outline-info btn-block"
-              data-toggle="modal"
-              data-target="#addCategoryModal"
-            >
-              <i className="fas fa-plus"> Add Category </i>
-            </button>
-          </div>
-          <div className="col-md-4  my-1">
-            <button className="btn btn-outline-warning btn-block">
-              <i className="fas fa-plus"> Add Food </i>
-            </button>
-          </div>
-          <div className="col-md-4  my-1">
-            <button className="btn btn-outline-success btn-block">
-              <i className="fas fa-money-check-alt"> View Orders </i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-  const showCategoryModal = () => (
+  const AdminCategoryModal = () => (
     <div id="addCategoryModal" className="modal" onClick={handleResetMessages}>
       <div className="modal-dialog modal-dialog-centered modal-lg">
         <div className="modal-content">
@@ -161,13 +119,7 @@ const Admin = () => {
     </div>
   );
 
-  return (
-    <section>
-      {showHeader()}
-      {showActionButtons()}
-      {showCategoryModal()}
-    </section>
-  );
+  return <section>{AdminCategoryModal()}</section>;
 };
 
-export default Admin;
+export default AdminCategoryModal;

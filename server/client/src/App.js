@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import Admin from "./components/screens/Dashboard/Admin";
-import User from "./components/screens/Dashboard/User";
+import Admin from "./components/screens/AdminDashboard/Admin";
+import User from "./components/screens/UserDashboard/User";
 import Header from "./components/screens/Header/Header";
 import Home from "./components/screens/Home/Home";
 import Notfound from "./components/screens/Notfound/Notfound";

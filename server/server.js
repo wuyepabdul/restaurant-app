@@ -10,13 +10,15 @@ dotenv.config();
 //import routes
 const authRoute = require("./routes/authRoute.js");
 const categoryRoute = require("./routes/categoryRoute.js");
+const productRoute = require("./routes/productRoute.js");
 // middleware
 app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
 app.use("/api/auth", authRoute);
-app.use("/api", categoryRoute);
+app.use("/api/category", categoryRoute);
+app.use("/api/product", productRoute);
 
 dbconnection();
 
