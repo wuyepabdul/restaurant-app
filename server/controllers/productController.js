@@ -25,7 +25,10 @@ exports.create = async (req, res) => {
     });
 
     const savedProduct = await product.save();
-    res.json({ successMessage: `${productName} was created`, savedProduct });
+    res.json({
+      successMessage: `${productName} was created`,
+      product: savedProduct,
+    });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ errorMessage: "Please try again" });

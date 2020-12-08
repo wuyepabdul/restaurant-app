@@ -2,69 +2,42 @@ import React, { Fragment, useState } from "react";
 import { isEmpty } from "validator";
 import { showErrorMessage, showSuccessMessage } from "../../helpers/message";
 import { showLoading } from "../../helpers/loading";
-import { createCategory } from "../../api/category";
+import { useDispatch, useSelector } from "react-redux";
+import { clearMessages } from "../../../redux/actions/messagesAction";
+import { createCategory } from "../../../redux/actions/categoryAction";
 
 const AdminCategoryModal = () => {
-  const [loading, setLoading] = useState(false);
+  /* REDUX GLOBAL STATE PROPERTIES */
+  const { successMsg, errorMsg } = useSelector((state) => state.messages);
+  const { loading } = useSelector((state) => state.loading);
+  const dispatch = useDispatch();
 
+  /* COMPONENT STATE */
+  const [componentErrorMsg, setComponentErrorMsg] = useState("");
   // set formdata state
-  const [formData, setFormData] = useState({
-    category: "",
-
-    errorMsg: false,
-    successMsg: false,
-  });
-
-  const { category, successMsg, errorMsg } = formData;
+  const [category, setCategory] = useState("");
 
   const handleResetMessages = (e) => {
-    setFormData({
-      ...formData,
-      errorMsg: "",
-      successMsg: "",
-      [e.target.name]: "",
-    });
+    dispatch(clearMessages());
+    setComponentErrorMsg("");
+    setCategory("");
   };
 
   //handle change
   const handleCategoryChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-      errorMsg: "",
-      successMsg: "",
-    });
+    dispatch(clearMessages());
+    setComponentErrorMsg("");
+    setCategory(e.target.value);
   };
 
   // handle category submit
   const handleCategorySubmit = (e) => {
     e.preventDefault();
     if (isEmpty(category)) {
-      setFormData({
-        ...formData,
-        errorMsg: "All fields are required",
-      });
+      setComponentErrorMsg("Please enter a category");
     } else {
-      const { category } = formData;
       const data = { category };
-      setLoading(true);
-      createCategory(data)
-        .then((response) => {
-          setLoading(false);
-          setFormData({
-            ...formData,
-            successMsg: response.data.successMessage,
-            category: "",
-          });
-        })
-        .catch((error) => {
-          setLoading(false);
-          setFormData({
-            ...formData,
-            errorMsg: error.response.data.errorMessage,
-            category: "",
-          });
-        });
+      dispatch(createCategory(data));
     }
   };
 
@@ -82,6 +55,11 @@ const AdminCategoryModal = () => {
               </button>
             </div>
             <div className="modal-body my-2">
+              {componentErrorMsg && (
+                <div className="text-center">
+                  {showErrorMessage(componentErrorMsg)}
+                </div>
+              )}
               {errorMsg && (
                 <div className="text-center">{showErrorMessage(errorMsg)}</div>
               )}

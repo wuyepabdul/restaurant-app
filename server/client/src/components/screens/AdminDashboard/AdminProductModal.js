@@ -1,20 +1,23 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, { Fragment, useState } from "react";
 import { isEmpty } from "validator";
 import { showErrorMessage, showSuccessMessage } from "../../helpers/message";
 import { showLoading } from "../../helpers/loading";
-import { createProduct } from "../../api/product";
-import { getCategories } from "../../api/category";
 
-const AdminFoodModal = () => {
-  const [categories, setCategories] = useState(null);
-  const [loading, setLoading] = useState(false);
+import { useDispatch, useSelector } from "react-redux";
+import { createProduct } from "../../../redux/actions/productActions";
+import { clearMessages } from "../../../redux/actions/messagesAction";
+
+const AdminProductModal = () => {
+  /* REDUX STATES */
+  const { loading } = useSelector((state) => state.loading);
+  const { successMsg, errorMsg } = useSelector((state) => state.messages);
+  const { categories } = useSelector((state) => state.categories);
+  const dispatch = useDispatch();
+
+  /* COMPONENT STATES */
+
+  const [componentErrorMsg, setComponentErrorMsg] = useState("");
   // set formdata state
-  const [formData, setFormData] = useState({
-    errorMsg: false,
-    successMsg: false,
-  });
-
-  const { successMsg, errorMsg } = formData;
 
   const [productData, setProductData] = useState({
     productImage: null,
@@ -34,19 +37,10 @@ const AdminFoodModal = () => {
     productQuantity,
   } = productData;
 
-  //load categories on page load from db
-  useEffect(() => {
-    loadCategories();
-  }, [loading]);
   // handle reset messages
 
   const handleResetMessages = (e) => {
-    setFormData({
-      ...formData,
-      errorMsg: "",
-      successMsg: "",
-      [e.target.name]: "",
-    });
+    dispatch(clearMessages());
   };
 
   // handleProductImage
@@ -69,29 +63,17 @@ const AdminFoodModal = () => {
     e.preventDefault();
 
     if (productImage === null) {
-      setFormData({
-        ...formData,
-        errorMsg: "Please select an Image",
-      });
+      setComponentErrorMsg("Please select an Image");
     } else if (
       isEmpty(productName) ||
       isEmpty(productDescription) ||
       isEmpty(productPrice)
     ) {
-      setFormData({
-        ...formData,
-        errorMsg: "All fields are required",
-      });
+      setComponentErrorMsg("All fields are required");
     } else if (isEmpty(productCategory)) {
-      setFormData({
-        ...formData,
-        errorMsg: "Please select a category",
-      });
+      setComponentErrorMsg("Please select a category");
     } else if (isEmpty(productQuantity)) {
-      setFormData({
-        ...formData,
-        errorMsg: "Please select a quantity",
-      });
+      setComponentErrorMsg("Please select a quantity");
     } else {
       let formData = new FormData();
       formData.append("productImage", productImage);
@@ -101,42 +83,16 @@ const AdminFoodModal = () => {
       formData.append("productCategory", productCategory);
       formData.append("productQuantity", productQuantity);
 
-      setLoading(true);
-      createProduct(formData)
-        .then((response) => {
-          setLoading(false);
-          setProductData({
-            productImage: null,
-            productName: "",
-            productDescription: "",
-            productPrice: "",
-            productCategory: "",
-            productQuantity: "",
-          });
-
-          setFormData({
-            ...formData,
-            successMsg: response.data.successMessage,
-          });
-        })
-        .catch((error) => {
-          setLoading(false);
-          setFormData({
-            ...formData,
-            errorMsg: error.response.data.errorMessage,
-          });
-        });
-    }
-  };
-
-  const loadCategories = async () => {
-    await getCategories()
-      .then((response) => {
-        setCategories(response.data.categories);
-      })
-      .catch((error) => {
-        console.log(error.message);
+      dispatch(createProduct(formData));
+      setProductData({
+        productImage: null,
+        productName: "",
+        productDescription: "",
+        productPrice: "",
+        productCategory: "",
+        productQuantity: "",
       });
+    }
   };
 
   const showFoodModal = () => (
@@ -153,6 +109,11 @@ const AdminFoodModal = () => {
               </button>
             </div>
             <div className="modal-body my-2">
+              {componentErrorMsg && (
+                <div className="text-center">
+                  {showErrorMessage(componentErrorMsg)}
+                </div>
+              )}
               {errorMsg && (
                 <div className="text-center">{showErrorMessage(errorMsg)}</div>
               )}
@@ -257,4 +218,4 @@ const AdminFoodModal = () => {
   return <section>{showFoodModal()}</section>;
 };
 
-export default AdminFoodModal;
+export default AdminProductModal;
