@@ -41,6 +41,7 @@ const AdminProductModal = () => {
 
   const handleResetMessages = (e) => {
     dispatch(clearMessages());
+    setComponentErrorMsg("");
   };
 
   // handleProductImage

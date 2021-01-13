@@ -47,9 +47,14 @@ const AdminCategoryModal = () => {
     if (isEmpty(category)) {
       setClientSideError("Please select a category");
     } else {
-      const { category } = formData;
-      const data = { category };
-      dispatch(createCategory(data));
+      try {
+        const { category } = formData;
+        const data = { category };
+        dispatch(createCategory(data));
+      } catch (error) {
+        console.log("adminCategorymodal api error:", error.message);
+        setClientSideError("Please try again.");
+      }
     }
   };
 

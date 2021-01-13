@@ -11,12 +11,10 @@ exports.create = async (req, res) => {
     newCategory.category = category;
     newCategory = await newCategory.save();
 
-    res
-      .status(200)
-      .json({
-        category: newCategory,
-        successMessage: `${newCategory.category} was created`,
-      });
+    res.status(200).json({
+      category: newCategory,
+      successMessage: `${newCategory.category} was created`,
+    });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ errorMessage: "Please try again" });

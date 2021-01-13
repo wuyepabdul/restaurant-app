@@ -1,8 +1,8 @@
-const {
+import {
   SHOW_SUCCESS_MESSAGE,
   SHOW_ERROR_MESSAGE,
   CLEAR_MESSAGES,
-} = require("../constants/messageConstants");
+} from "../constants/messageConstants";
 
 const INITIAL_STATE = {
   successMsg: "",

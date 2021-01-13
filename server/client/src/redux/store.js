@@ -5,11 +5,13 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import loadingReducer from "./reducers/loadingReducer";
 import messagesReducer from "./reducers/messagesReducer";
 import categoryReducer from "./reducers/categoryReducer";
+import productReducer from "./reducers/productReducer";
 
 const reducer = combineReducers({
   loading: loadingReducer,
   messages: messagesReducer,
   categories: categoryReducer,
+  products: productReducer,
 });
 const innitialState = {};
 const middleware = [thunk];

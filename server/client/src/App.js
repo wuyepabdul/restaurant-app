@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Admin from "./components/screens/AdminDashboard/Admin";
 import User from "./components/screens/UserDashboard/User";
@@ -9,15 +9,9 @@ import AdminRoute from "./components/screens/ProtectedRoute/AdminRoute";
 import UserRoute from "./components/screens/ProtectedRoute/UserRoute";
 import Signin from "./components/screens/Signin/Signin";
 import Signup from "./components/screens/Signup/Signup";
-import { useDispatch } from "react-redux";
-import { getCategories } from "./redux/actions/categoryAction";
+import AdminEditProduct from "./components/screens/AdminDashboard/AdminEditProduct";
 
 const App = () => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(getCategories());
-  }, [dispatch]);
   return (
     <BrowserRouter>
       <Header />
@@ -27,6 +21,11 @@ const App = () => {
           <Route exact path="/signin" component={Signin} />
           <Route exact path="/signup" component={Signup} />
           <AdminRoute exact path="/admin/dashboard" component={Admin} />
+          <AdminRoute
+            exact
+            path="/admin/edit/product/:productId"
+            component={AdminEditProduct}
+          />
           <UserRoute exact path="/user/dashboard" component={User} />
           <Route component={Notfound} />
         </Switch>

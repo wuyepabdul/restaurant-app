@@ -19,6 +19,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoute);
 app.use("/api/category", categoryRoute);
 app.use("/api/product", productRoute);
+app.use("/uploads", express.static("uploads"));
 
 dbconnection();
 

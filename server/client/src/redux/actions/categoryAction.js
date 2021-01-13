@@ -20,7 +20,10 @@ export const getCategories = () => async (dispatch) => {
     dispatch({ type: STOP_LOADING });
     dispatch({
       type: SHOW_ERROR_MESSAGE,
-      payload: error.response.data.errorMessage,
+      payload:
+        error.response.data && error.response.data.errorMessage
+          ? error.response.data.message
+          : error.message,
     });
   }
 };
